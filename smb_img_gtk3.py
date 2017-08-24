@@ -47,9 +47,9 @@ class MyWindow(Gtk.ApplicationWindow):
 		filename = entry.get_text()
 		filename = filename + ".tif"
 		path ='/gbss/fmdscandata/invoice/'
-		smb_structs.SUPPORT_SMB2 =False
-		conn = SMBConnection("power95", "fmdata", "", "", use_ntlm_v2=False)
-		assert conn.connect("192.168.5.250",445)
+		smb_structs.SUPPORT_SMB2 =False #smb2 True or False
+		conn = SMBConnection("#username", "#passwd", "#client_machine_name", "#remote_machine_name", use_ntlm_v2=False)
+		assert conn.connect("#IP,#Port)
 
 		file_obj=StringIO()
 		file_attributes, filesize = conn.retrieveFile('IMAGES', path+filename, file_obj)

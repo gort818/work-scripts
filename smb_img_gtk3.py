@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+# A gui script to download images from a samba server with their name and open them with an image viewer.
+
 import gi,sys
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk

@@ -1,0 +1,52 @@
+#!/bin/bash
+     
+#DropBox Backup script
+
+YEAR=`date +%Y`
+MONTH=`date +%b`
+DAY=`date +%d`
+BACKUP_DIR="/mnt/dropbox/backup"
+# Make the year dir if it does not exist
+if [ ! -d $BACKUP_DIR/$YEAR ]; then
+  	 mkdir $BACKUP_DIR/$YEAR
+fi
+# Make the month dir if it does not exist
+if [ ! -d $BACKUP_DIR/$YEAR/$MONTH ]; then
+	mkdir $BACKUP_DIR/$YEAR/$MONTH
+fi
+
+#Todays date in ISO-8601 format:
+DAY0=`date -I`
+     
+#Yesterdays date in ISO-8601 format:
+DAY1=`date -I -d "1 day ago"`    
+
+#The source directory:
+SRC="/mnt/dropbox/backup/base/"
+     
+#The target directory:
+TRG="/mnt/dropbox/backup/$YEAR/$MONTH/$DAY0"
+     
+#The link destination directory:
+LNK="/mnt/dropbox/backup/$YEAR/$MONTH/$DAY1"
+     
+#The rsync options:
+OPT="-avh --delete --link-dest=$LNK"
+
+     
+#Execute the backup
+#Use rclone to keep the base folder synced with dropbox
+rclone sync testdrop:/ /mnt/dropbox/backup/base/
+#If it is the first of the month do a full backup of dropbox
+if [ $DAY -eq 1 ]; then
+	rsync -avz /mnt/dropbox/backup/base/ $BACKUP_DIR/$YEAR/$MONTH/FULL
+fi
+#Do an incremental backup
+rsync $OPT $SRC $TRG
+#If all is ok send a success email, if not send a failed email
+if [ $? -eq 0 ]
+then
+	/usr/sbin/ssmtp 'enter email'< backup_success.txt
+else
+	/usr/sbin/ssmtp 'enter email' < backup_fail.txt
+fi
